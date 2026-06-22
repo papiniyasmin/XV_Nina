@@ -8,22 +8,38 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MessageCircle, Calendar } from "lucide-react";
+import { Users, MessageCircle, Calendar, AlertTriangle } from "lucide-react";
 
 // Força o Next.js a não fazer cache, para a lista atualizar sempre
 export const revalidate = 0;
 
 export default async function ListaNinaPage() {
-  // Busca os dados do Aiven
-  const [rows]: any = await db.query(
-    "SELECT * FROM presencas ORDER BY data_registro DESC"
-  );
+  let rows: any[] = [];
+  let dbError = false;
 
-  const totalConvidados = rows.reduce((acc: number, curr: any) => {
-    return curr.confirmado === 'sim' ? acc + curr.quantidade_convidados : acc;
+  try {
+    // Busca os dados do Aiven
+    // Se você estiver usando PostgreSQL, mude a linha abaixo para: const { rows: data } = await db.query(...)
+    const result: any = await db.query(
+      "SELECT * FROM presencas ORDER BY data_registro DESC"
+    );
+    
+    // Tratamento genérico caso seja MySQL (array) ou PostgreSQL (objeto com a propriedade rows)
+    rows = Array.isArray(result) ? result[0] : (result.rows || result);
+
+  } catch (error) {
+    console.error("Erro ao buscar dados do banco:", error);
+    dbError = true;
+  }
+
+  // Cálculos seguros (só rodam se rows for realmente um array válido)
+  const safeRows = Array.isArray(rows) ? rows : [];
+  
+  const totalConvidados = safeRows.reduce((acc: number, curr: any) => {
+    return curr.confirmado === 'sim' ? acc + (Number(curr.quantidade_convidados) || 0) : acc;
   }, 0);
 
-  const totalConfirmados = rows.filter((r: any) => r.confirmado === 'sim').length;
+  const totalConfirmados = safeRows.filter((r: any) => r.confirmado === 'sim').length;
 
   return (
     <main className="min-h-screen bg-[#0a0514] p-8 text-white">
@@ -54,6 +70,14 @@ export default async function ListaNinaPage() {
           </div>
         </div>
 
+        {/* Alerta de Erro no Banco (opcional, bom para debugar) */}
+        {dbError && (
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-4 rounded-md flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 shrink-0" />
+            <p>Ocorreu um erro ao conectar com o banco de dados. Verifique o terminal do VS Code.</p>
+          </div>
+        )}
+
         {/* Tabela de Dados */}
         <Card className="bg-zinc-900/40 border-purple-500/20 backdrop-blur-md overflow-hidden">
           <Table>
@@ -67,8 +91,8 @@ export default async function ListaNinaPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((convidado: any) => (
-                <TableRow key={convidado.id} className="border-purple-500/10 hover:bg-purple-500/5 text-zinc-300">
+              {safeRows.map((convidado: any) => (
+                <TableRow key={convidado.id || convidado.nome} className="border-purple-500/10 hover:bg-purple-500/5 text-zinc-300">
                   <TableCell className="font-medium text-white">{convidado.nome}</TableCell>
                   <TableCell>{convidado.whatsapp}</TableCell>
                   <TableCell>
@@ -77,7 +101,7 @@ export default async function ListaNinaPage() {
                       ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                       : 'bg-red-500/20 text-red-400 border border-red-500/30'
                     }`}>
-                      {convidado.confirmado.toUpperCase()}
+                      {String(convidado.confirmado).toUpperCase()}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">{convidado.quantidade_convidados}</TableCell>
@@ -91,7 +115,7 @@ export default async function ListaNinaPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {rows.length === 0 && (
+              {!dbError && safeRows.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-10 text-zinc-500 italic">
                     Nenhuma confirmação recebida ainda...
