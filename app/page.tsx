@@ -10,7 +10,6 @@ export default function Home() {
       <HeroSection />
       <EventDetails />
       <RsvpForm />
-      <GaleriaNina />
       <Footer />
     </main>
   )
