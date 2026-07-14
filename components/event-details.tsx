@@ -50,7 +50,7 @@ export function EventDetails() {
                 Horário
               </h3>
               <p className="font-serif text-2xl text-white">
-                19:00
+                17:00
               </p>
               <p className="font-sans text-lg text-purple-300/60 mt-1">
                 Recepção
@@ -71,7 +71,7 @@ export function EventDetails() {
                 Salão de Festas
               </p>
               <p className="font-sans text-lg text-purple-300/60 mt-1">
-                Endereço a confirmar
+                Grupo Desportivo Do Rio Seco - Castro Marim
               </p>
             </CardContent>
           </Card>
