@@ -16,8 +16,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Nina XV - Confirmacao de Presenca',
-  description: 'Confirme sua presenca na festa de 15 anos da Nina'
+  title: 'Nina XV - Confirmacao de Presença',
+  description: 'Confirme sua presença na festa de 15 anos da Nina'
 }
 
 export default function RootLayout({
