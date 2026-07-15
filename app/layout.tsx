@@ -16,7 +16,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Nina XV - Confirmacao de Presença',
+  title: 'Nina XV - Confirmação de Presença',
   description: 'Confirme sua presença na festa de 15 anos da Nina'
 }
 
