@@ -91,7 +91,7 @@ export function RsvpForm() {
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-purple-500" />
           </div>
           <p className="font-sans text-zinc-400 uppercase tracking-widest text-sm">
-            Por favor, responda até 01 de Março de 2026
+            Por favor, responda até 20 de Julho de 2026
           </p>
         </div>
 
